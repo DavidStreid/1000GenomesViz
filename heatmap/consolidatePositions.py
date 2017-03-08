@@ -46,5 +46,7 @@ for filename in os.listdir(heatMapDirectory):
                 # Write to file
                 file = targetDirectory + '/' + pop + '_mutFreq.json'
                 target = open(file, 'w')
-                for k, v in posDic.iteritems():     
-                    target.write(json.dumps({'pos': k, 'count': v[0], 'severity': v[1], 'change': v[2]}) + '\n')
+                for k, v in posDic.items()[:-1]:     
+                    target.write(json.dumps({'pos': k, 'count': v[0], 'severity': v[1], 'change': v[2]}).replace(" ", "") + ',\n')
+                target.write(json.dumps({'pos': k, 'count': v[0], 'severity': v[1], 'change': v[2]}).replace(" ", ""))
+
