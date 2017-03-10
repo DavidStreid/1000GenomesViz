@@ -3,16 +3,18 @@ import sys
 import re
 import json
 
-# Converts file in the following format to JSON -
-#     INPUT
-#         Population,Sample,Mut,Severity,col,row
-#         ACB,HG02052,chrMT-990-C,2.0,110,23
-#         ACB,HG02325,chrMT-1007-A,1.0,2,45
-#     OUTPUT
-#         {"count": 32, "pos": "15784", "change": "C", "severity": "-1.0"}
-#         {"count": 4, "pos": "15431", "change": "A", "severity": "-1.0"}
-#         {"count": 1, "pos": "15470", "change": "C", "severity": "-1.0"}
-# $ python consolidatePositions.py . consolidatedPositions/
+'''
+Converts file in the following format to JSON -
+    INPUT
+        Population,Sample,Mut,Severity,col,row
+        ACB,HG02052,chrMT-990-C,2.0,110,23
+        ACB,HG02325,chrMT-1007-A,1.0,2,45
+    OUTPUT
+        {"count": 32, "pos": "15784", "change": "C", "severity": "-1.0"}
+        {"count": 4, "pos": "15431", "change": "A", "severity": "-1.0"}
+        {"count": 1, "pos": "15470", "change": "C", "severity": "-1.0"}
+$ python consolidatePositions.py . consolidatedPositions/
+'''
 
 if(len(sys.argv) < 3):
     print "ERROR: Specify an input and output directory"
@@ -43,10 +45,20 @@ for filename in os.listdir(heatMapDirectory):
                     else:
                         posDic[loc] = [1, mutData[3], mut]  #[count, severity, base change]
 
-                # Write to file
+                '''
+                Write to file
+                Bulk queries take very simple, but exact formats (don't forget the new lines)
+                    action_and_meta_data\n
+                    optional_source\n
+                '''
                 file = targetDirectory + '/' + pop + '_mutFreq.json'
                 target = open(file, 'w')
+                target.write('{ "index" : { "_index" : "heatmap", "_type" : "mutFreq", "_id" : "' + pop + '"} }' + '\n')
+                target.write('{"mutList":[')
                 for k, v in posDic.items()[:-1]:     
-                    target.write(json.dumps({'pos': k, 'count': v[0], 'severity': v[1], 'change': v[2]}).replace(" ", "") + ',\n')
-                target.write(json.dumps({'pos': k, 'count': v[0], 'severity': v[1], 'change': v[2]}).replace(" ", ""))
+                    target.write(json.dumps({'pos': str(k), 'count': v[0], 'severity': v[1], 'change': v[2]}).replace(" ", "") + ',')
+                target.write(json.dumps({'pos': str(k), 'count': v[0], 'severity': v[1], 'change': v[2]}).replace(" ", ""))
+                target.write(']}\n')
+
+                # TODO - Write the CURL request to index file
 
