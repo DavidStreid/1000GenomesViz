@@ -2,6 +2,7 @@ import os
 import sys
 import re
 import json
+import requests
 
 '''
 Converts file in the following format to JSON -
@@ -56,9 +57,6 @@ for filename in os.listdir(heatMapDirectory):
                 target.write('{ "index" : { "_index" : "heatmap", "_type" : "mutFreq", "_id" : "' + pop + '"} }' + '\n')
                 target.write('{"mutList":[')
                 for k, v in posDic.items()[:-1]:     
-                    target.write(json.dumps({'pos': str(k), 'count': v[0], 'severity': v[1], 'change': v[2]}).replace(" ", "") + ',')
-                target.write(json.dumps({'pos': str(k), 'count': v[0], 'severity': v[1], 'change': v[2]}).replace(" ", ""))
+                    target.write(json.dumps({'pos': int(k), 'count': v[0], 'severity': float(v[1]), 'change': v[2]}).replace(" ", "") + ',')
+                target.write(json.dumps({'pos': int(k), 'count': v[0], 'severity': float(v[1]), 'change': v[2]}).replace(" ", ""))
                 target.write(']}\n')
-
-                # TODO - Write the CURL request to index file
-
